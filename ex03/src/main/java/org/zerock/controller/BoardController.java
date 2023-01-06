@@ -108,7 +108,7 @@ public class BoardController {
 //	}
 	
 	// 삭제 처리 + 
-	@PostMapping("/remove")                                            /* 추가 */
+	@PostMapping("/remove")                                     /* 추가 - 객체를 모델에 담는다. */         /*페이지이동*/
 	public String remove(@RequestParam("bno") Long bno, @ModelAttribute("cri") Criteria cri, RedirectAttributes rttr) {
 		log.info("remove..." + bno);
 		if(service.remove(bno)) {

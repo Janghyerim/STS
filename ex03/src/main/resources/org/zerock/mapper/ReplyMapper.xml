@@ -45,5 +45,15 @@
 		
 	</select>
 	
+	<!-- 댓글의 페이징처리와 인덱스를 이용한 페이징 쿼리 -->
+	<select id="getListWithPaging" resultType="org.zerock.domain.ReplyVO">
+		<![CDATA[
+			select
+		
+		]]>
+	
+	
+	</select>
+	
 	
 </mapper>

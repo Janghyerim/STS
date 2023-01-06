@@ -20,7 +20,7 @@ public class ReplyServiceImpl implements ReplyService {
 	
 	
 	@Override
-	public int register(ReplyVO vo) {
+	public int register(ReplyVO vo) {  //새로운 댓글등록
 		
 		log.info("register....." + vo);
 		
@@ -55,7 +55,7 @@ public class ReplyServiceImpl implements ReplyService {
 	
 	
 	@Override
-	public List<ReplyVO> getList(Criteria cri, Long bno) {
+	public List<ReplyVO> getList(Criteria cri, Long bno) {  //전체댓글목록 + 페이징처리
 		
 		log.info("get Reply List of a Board " + bno);
 		
