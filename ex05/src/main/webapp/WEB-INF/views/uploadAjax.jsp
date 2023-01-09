@@ -57,6 +57,12 @@
 	<div class='uploadDiv'>
       <input type='file' name='uploadFile' multiple>
    	</div>
+   	
+   	<!-- 실제 원본 이미지 보여주는 영역 -->
+   	<div class='bigPictureWrapper'>
+   		<div class='bigPicture'>
+   		</div>
+   	</div>
    
    	<div class='uploadResult'>
          <ul>
@@ -69,6 +75,46 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	
 	<script>
+	
+	function showImage(fileCallPath){
+		//alert(fileCallPath);
+		
+		$(".bigPictureWrapper").css("display", "flex").show();
+		
+		$(".bigPicture")
+		.html("<img src='/display?fileName="+ encodeURI(fileCallPath) +"'>")
+		.animate({width:'100%', height:'100%'}, 1000);
+	}
+	
+	//빅 픽쳐 닫는 이벤트 처리
+	$(".bigPictureWrapper").on("click", function(e) {
+	      $(".bigPicture").animate({ width : '0%', height : '0%' }, 1000);
+	      setTimeout(() => {
+	         $(this).hide();
+	      }, 1000); 
+	   });
+
+	
+	//"x"표시에 대한 이벤트 처리
+	$(".uploadResult").on("click", "span", function(e){
+		var targetFile = $(this).data("file");
+		var type = $(this).data("type");
+		console.log("targetFile");
+		
+		$.ajax({
+			url : '/deleteFile',
+			data : {fileName: targetFile, type: type},
+			dataType: 'text',
+			type: 'POST',
+				success: function(result){
+					alert(result);
+				}
+		});  //$.ajax
+		
+	});
+
+	
+	$(document).ready(function(){
 		//파일의 확장자나 크기 처리 
 		var regex = new RegExp("(.*?)\.(exe|sh|zip|alz)$");
 		var maxSize = 5242880; //5MB
@@ -132,6 +178,7 @@
 		
 			
 		/* 목록을 보여주는 부분을 별도의 함수로 처리 */
+		/* get방식으로 처리할 때 공백,한글이름 오류방지를 위해 encodeURIComponent()를 이용해 URI호출에 적합한 문자열로 인코딩 처리 */
 		var uploadResult = $(".uploadResult ul");
 			   
 			 function showUploadedFile(uploadResultArr){
@@ -141,9 +188,30 @@
 			    $(uploadResultArr).each(function(i, obj){
 			    			
 			    	if(!obj.image){
-			    		str += "<li><img src = '/resources/img/attach.png'>" + obj.fileName + "</li>"; 
+			    		//첨부파일 다운되게 추가 및 변경
+			    		var fileCallPath = encodeURIComponent(obj.uploadPath + "/" + obj.uuid + "_" + obj.fileName);
+			    		
+			    		var fileLink = fileCallPath.replace(new RegExp(/\\/g), "/");
+			    		
+			    		str += "<li><div><a href='/download?fileName="+fileCallPath+"'>"+
+			    				"<img src = '/resources/img/attach.png'>" + obj.fileName + "</a>"+
+			    				"<span data-file = \'"+ fileCallPath +"\' data-type='file'> x </span>" + "</div></li>"; 
+			    	
+			    	//썸네일 이미지 보여주는 부분
 			    	}else{
-			    		str += "<li>" + obj.fileName + "</li>";
+			    		//str += "<li>" + obj.fileName + "</li>";
+			    		
+			    		var fileCallPath = encodeURIComponent( obj.uploadPath + "/s_" + obj.uuid + "_" + obj.fileName);
+			    		
+			    		//자바스크립트 코드에서 섬네일 클릭 시 showImage()가 호출될 수 있는 코드를 추가
+			    		var originPath = obj.uploadPath + "\\" + obj.uuid + "_" + obj.fileName;
+			    		
+			    		originPath = originPath.replace(new RegExp(/\\/g),"/");
+			    		
+			    		str += "<li><a href=\"javascript:showImage(\'"+originPath+"\')\">" + 
+			    				"<img src='/display?fileName="+fileCallPath+"'></a>" + 
+			    						"<span data-file=\'" + fileCallPath +"\' data-type='image'> x </span>" + 
+			    						"</li>";
 			    	}
 			 	});
 			      
@@ -151,6 +219,8 @@
 			 }
 	
 		});
+		
+	});
 	</script>
 		
 	
